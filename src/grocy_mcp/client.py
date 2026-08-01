@@ -158,3 +158,25 @@ def add_to_shopping_list(payload: dict[str, Any]) -> dict[str, Any]:
 def remove_from_shopping_list(payload: dict[str, Any]) -> dict[str, Any]:
     data = _request("POST", "/stock/shoppinglist/remove-product", json=payload)
     return data if isinstance(data, dict) else {"ok": True, "response": data}
+
+
+def set_userfields(entity: str, object_id: int | str, payload: dict[str, Any]) -> dict[str, Any]:
+    data = _request("PUT", f"/userfields/{entity}/{object_id}", json=payload)
+    if isinstance(data, dict) and data.get("ok") and len(data) <= 2:
+        return get_object(entity, object_id).get("userfields", {})
+    return data
+
+
+def list_chores() -> list[dict[str, Any]]:
+    data = _request("GET", "/chores")
+    return data if isinstance(data, list) else []
+
+
+def execute_chore(chore_id: int | str, payload: dict[str, Any]) -> dict[str, Any]:
+    data = _request("POST", f"/chores/{chore_id}/execute", json=payload)
+    return data if isinstance(data, dict) else {"ok": True, "response": data}
+
+
+def list_tasks() -> list[dict[str, Any]]:
+    data = _request("GET", "/tasks")
+    return data if isinstance(data, list) else []

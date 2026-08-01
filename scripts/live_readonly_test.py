@@ -25,6 +25,8 @@ READ_ONLY_CALLS = [
     ("grocy_list_shopping_list_items", {"include_done": True, "limit": 5}),
     ("grocy_list_entity", {"entity": "quantity_units", "limit": 5}),
     ("grocy_get_entity_object", {"entity": "products", "object_id": 1}),
+    ("grocy_list_chores", {"limit": 5}),
+    ("grocy_list_tasks", {"limit": 5}),
 ]
 
 

@@ -305,6 +305,60 @@ def register_tools(mcp: FastMCP) -> None:
         except Exception as exc:
             return f"Error removing product {product_id} from shopping list: {exc}"
 
+    @mcp.tool()
+    async def grocy_set_userfields(
+        entity: WritableEntity,
+        object_id: Annotated[int, Field(description="Object id inside the selected Grocy entity")],
+        payload_json: Annotated[
+            str, Field(description="JSON object of userfield name/value pairs to PUT to /api/userfields/{entity}/{object_id}")
+        ],
+    ) -> str:
+        """Set userfield values on a Grocy entity object. Field definitions must already exist (create them via grocy_create_entity_object on the 'userfields' entity)."""
+        try:
+            payload = _parse_object(payload_json)
+            return _json(api.set_userfields(entity, object_id, payload))
+        except Exception as exc:
+            return f"Error setting userfields for {entity}/{object_id}: {exc}"
+
+    @mcp.tool()
+    async def grocy_list_chores(
+        limit: Annotated[int, Field(description="Maximum number of chores to return, 1-500")] = 100,
+        offset: Annotated[int, Field(description="Number of chores to skip before returning results")] = 0,
+    ) -> str:
+        """List Grocy chores including their computed next_estimated_execution_time, which generic entity CRUD cannot reach."""
+        try:
+            return _json(_page(api.list_chores(), limit, offset))
+        except Exception as exc:
+            return f"Error listing Grocy chores: {exc}"
+
+    @mcp.tool()
+    async def grocy_execute_chore(
+        chore_id: Annotated[int, Field(description="The id of the chore to execute")],
+        done_by: Annotated[int | None, Field(description="Optional user id who executed the chore")] = None,
+        tracked_time: Annotated[
+            str | None,
+            Field(description="Optional ISO timestamp to backdate the execution to, e.g. '2026-07-29 00:00:00'. Omit to track as now."),
+        ] = None,
+        skipped: Annotated[bool, Field(description="Skip this occurrence instead of executing it")] = False,
+    ) -> str:
+        """Execute (mark done) a Grocy chore, optionally backdated via tracked_time."""
+        try:
+            payload = _drop_none({"done_by": done_by, "tracked_time": tracked_time, "skipped": skipped})
+            return _json(api.execute_chore(chore_id, payload))
+        except Exception as exc:
+            return f"Error executing Grocy chore {chore_id}: {exc}"
+
+    @mcp.tool()
+    async def grocy_list_tasks(
+        limit: Annotated[int, Field(description="Maximum number of tasks to return, 1-500")] = 100,
+        offset: Annotated[int, Field(description="Number of tasks to skip before returning results")] = 0,
+    ) -> str:
+        """List Grocy tasks."""
+        try:
+            return _json(_page(api.list_tasks(), limit, offset))
+        except Exception as exc:
+            return f"Error listing Grocy tasks: {exc}"
+
 
 def _drop_none(data: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in data.items() if v is not None}

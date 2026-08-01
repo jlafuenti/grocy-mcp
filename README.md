@@ -87,6 +87,10 @@ Grocy API keys are managed in Grocy under **Manage API keys**. The API accepts t
 | `grocy_inventory_product` | Set product inventory amount |
 | `grocy_add_product_to_shopping_list` | Add a product to a shopping list |
 | `grocy_remove_product_from_shopping_list` | Remove a product from a shopping list |
+| `grocy_set_userfields` | Set userfield values on an entity object |
+| `grocy_list_chores` | List chores including computed next-due times |
+| `grocy_execute_chore` | Execute (mark done) a chore, optionally backdated |
+| `grocy_list_tasks` | List tasks |
 
 ## Development and validation
 
